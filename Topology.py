@@ -4,6 +4,7 @@ import os.path
 
 """
 Requires the topo file to be in this format:
+(Jan 2019)
 
 SA:5CPK-St_Marys:SWCMT0000068
 SA:5ADB-Greenfields:SWCMT0000081
@@ -17,11 +18,15 @@ VIC:3FSR-Footscray:SWCMT0000182
 """
 
 class Topology:
-    def __init__(self, topologyImportFile):
+    def __init__(self, topologyImportFile, debug=None):
         try:
             tif = open(topologyImportFile, 'r')    
-        except IOError as ioe:
-            print str(ioe)
+        except (IOError, TypeError) as e:
+            print "Invalid topology file: %s" % topologyImportFile
+
+            if debug:
+                print "DEBUG: %s" % str(e)
+
             sys.exit(1)
 
         topo = {}
@@ -35,10 +40,13 @@ class Topology:
             if not hub in topo[state]:
                 topo[state][hub] = {}
 
-            # in case we ever need some info about cmts, eg: IP
+            # CMTS' could be an array but to make search easier and faster
+            # and in case we ever need some info about cmts, eg: IP
+            # make this a dictionary with 'dummy' (1) value
             topo[state][hub][cmts] = 1
 
         self.topology = topo
+        self.debug = debug
 
     #
     # Methods
