@@ -23,6 +23,30 @@ class CmdReturnNonZeroException(Exception):
 
 
 #
+# Subclass
+
+from collections import defaultdict
+class NestedDict(dict):
+    def __getitem__(self, key):
+        if key in self:
+            return self.get(get)
+
+        return self.setdefault(key, NestedDict())
+
+
+#
+# Class
+
+class CTRLC_handler():
+    def __init__(self):
+        self.CTRLC = False
+
+    def signal_handler(self, signal, frame):
+        print "CTRL+C caught, bailing at user request.."
+        self.CTRLC = True
+
+
+#
 # Defs
 
 def alarm_handler(signum, frame):
@@ -48,10 +72,12 @@ def shellCmd(command, timeout=20):
         if retcode != 0:
             raise CmdReturnNonZeroException("Non-zero (%d) return for command" % retcode)
 
-    except CmdTimeoutException, e:
-        return None, e
-    except CmdReturnNonZeroException, e:
-        return None, e
+    except OSError as e:
+        return False, str(e)
+    except CmdTimeoutException as e:
+        return False, str(e)
+    except CmdReturnNonZeroException as e:
+        return False, str(e)
 
     outdata_list = []
     for line in outdata.splitlines():
@@ -60,7 +86,7 @@ def shellCmd(command, timeout=20):
 
         outdata_list.append(line)
 
-    return 1, outdata_list
+    return True, outdata_list
 
 def getDomsSite(site="local"):
     ret = [ "Could not identify DOMS site" ]
