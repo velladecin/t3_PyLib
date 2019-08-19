@@ -1,6 +1,7 @@
 #!/usr/bin/env python2.6
 import re
 import random
+import time
 from t3_PyLib.Ssh import *
 
 class NetworkDevice:
@@ -100,3 +101,9 @@ class NetworkDevice:
 
     def setOutdir(self, outdir): self.outdir = outdir
     def setOutput(self, output): self.output = output
+
+
+    #
+    # Other
+
+    def disconnect(self): self.closeSsh()
